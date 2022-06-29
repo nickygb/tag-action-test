@@ -58,3 +58,4 @@ jobs:
         VERBOSE: true
         PRERELEASE_SUFFIX: ${{ needs.set_environment_name.outputs.environmentName }}
         
+        
