@@ -54,3 +54,4 @@ jobs:
         INITIAL_VERSION: 0.0.0
         VERBOSE: true
         PRERELEASE_SUFFIX: ${{ needs.set_environment_name.outputs.environmentName }}
+
