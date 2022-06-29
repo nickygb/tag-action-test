@@ -3,6 +3,19 @@ on:
   push:
     branches:
       - master
+      - dev
+
+  pull_request:
+    branches:
+      - dev
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
+permissions: write-all
+
 jobs:
   set_environment_name:
     runs-on: ubuntu-latest
@@ -28,7 +41,6 @@ jobs:
         run: |
           echo "environmentName: ${{ steps.environment_name.outputs.result }}"
 
-
   build:
     needs:
       - set_environment_name
@@ -36,7 +48,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: Bump version and push tag
-      uses: anothrNick/github-tag-action@master
+      uses: anothrNick/github-tag-action@1.36.0
       env:
         RELEASE_BRANCHES: master,dev
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,3 +56,4 @@ jobs:
         INITIAL_VERSION: 0.0.0
         VERBOSE: true
         PRERELEASE_SUFFIX: ${{ needs.set_environment_name.outputs.environmentName }}
+
