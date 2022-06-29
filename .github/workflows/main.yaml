@@ -1,0 +1,46 @@
+name: Bump version
+on:
+  push:
+    branches:
+      - master
+jobs:
+  set_environment_name:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      environmentName: ${{ steps.environment_name.outputs.result }}
+    steps:
+      - name: Get Latest
+        uses: actions/checkout@v2
+
+      - name: Set Environment Name
+        uses: actions/github-script@v6
+        id: environment_name
+        with:
+          script: |
+            const isPr = context.payload.pull_request;
+            const environmentName = isPr
+              ? context.payload.pull_request.head.ref.replace("refs/heads/","").replaceAll("-","").replaceAll(" ","").replaceAll(":","").toLowerCase().substr(0,11)
+              : context.payload.ref.replace("refs/heads/","").replaceAll("-","").replaceAll(" ","").replaceAll(":","").toLowerCase().substr(0,11)
+            return environmentName
+          result-encoding: string
+      - name: Print outputs
+        run: |
+          echo "environmentName: ${{ steps.environment_name.outputs.result }}"
+
+
+  build:
+    needs:
+      - set_environment_name
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@master
+      env:
+        RELEASE_BRANCHES: master,dev
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        DEFAULT_BUMP: minor
+        INITIAL_VERSION: 0.0.0
+        VERBOSE: true
+        PRERELEASE_SUFFIX: ${{ needs.set_environment_name.outputs.environmentName }}
