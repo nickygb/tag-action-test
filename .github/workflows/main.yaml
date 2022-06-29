@@ -3,6 +3,17 @@ on:
   push:
     branches:
       - master
+      - dev
+
+  pull_request:
+    branches:
+      - dev
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - ready_for_review
+
 jobs:
   set_environment_name:
     runs-on: ubuntu-latest
@@ -27,7 +38,6 @@ jobs:
       - name: Print outputs
         run: |
           echo "environmentName: ${{ steps.environment_name.outputs.result }}"
-
 
   build:
     needs:
